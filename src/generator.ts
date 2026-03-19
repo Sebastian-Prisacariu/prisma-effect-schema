@@ -7,7 +7,7 @@ import { FileSystem } from "@effect/platform";
 import { NodeFileSystem, NodePath } from "@effect/platform-node";
 import { Path } from "@effect/platform/Path";
 import type { GeneratorOptions } from "@prisma/generator-helper";
-import { generatorHandler } from "@prisma/generator-helper";
+import generatorHelper from "@prisma/generator-helper";
 import { Effect, Layer, Option } from "effect";
 import { parseConfig } from "./config.js";
 import { NoOutputConfiguredError } from "./errors.js";
@@ -56,7 +56,7 @@ const PlatformLive = Layer.mergeAll(NodeFileSystem.layer, NodePath.layer);
 
 
 // Register as Prisma generator
-generatorHandler({
+generatorHelper.generatorHandler({
   onManifest() {
     return {
       defaultOutput: "./generated/effect-schemas.ts",
