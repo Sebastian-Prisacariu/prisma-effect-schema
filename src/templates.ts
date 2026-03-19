@@ -9,7 +9,6 @@ import dedent from "dedent";
 import { Array as Arr, HashMap, Order, pipe } from "effect";
 import type { GeneratorConfig } from "./config.js";
 import type { SchemaResolver } from "./resolver.js";
-import { SchemaResolver as SchemaResolverImpl } from "./resolver.js";
 
 // ============================================================================
 // Constants
@@ -126,18 +125,9 @@ export const generateFieldsCode = (
 
 export const generateModelSchema = (
   model: DMMF.Model,
-  brandedIds: HashMap.HashMap<string, string>,
-  foreignKeys: HashMap.HashMap<string, string>,
+  resolver: SchemaResolver,
   config: GeneratorConfig
 ): string => {
-  // Create resolver for this model
-  const resolver = SchemaResolverImpl.make({
-    modelName: model.name,
-    brandedIds,
-    foreignKeys,
-    config,
-  });
-
   const scalarFields = model.fields.filter((f) => f.kind !== "object");
   const hasRelations = model.fields.some((f) => f.kind === "object");
 
@@ -177,12 +167,11 @@ export const generateModelSchema = (
 
 export const generateModelSchemas = (
   models: readonly DMMF.Model[],
-  brandedIds: HashMap.HashMap<string, string>,
-  foreignKeys: HashMap.HashMap<string, string>,
+  makeResolver: (modelName: string) => SchemaResolver,
   config: GeneratorConfig
 ): string =>
   pipe(
     sortByName(models),
-    Arr.map((model) => generateModelSchema(model, brandedIds, foreignKeys, config)),
+    Arr.map((model) => generateModelSchema(model, makeResolver(model.name), config)),
     Arr.join("\n")
   );

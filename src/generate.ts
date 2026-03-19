@@ -6,7 +6,7 @@
 import type { DMMF } from "@prisma/generator-helper";
 import { HashMap } from "effect";
 import type { GeneratorConfig } from "./config.js";
-import { buildForeignKeyMap, collectBrandedIds } from "./resolver.js";
+import { buildForeignKeyMap, collectBrandedIds, SchemaResolver } from "./resolver.js";
 import {
   DEFAULT_HEADER,
   generateBrandedIdSchemas,
@@ -60,6 +60,10 @@ export const generate = (input: GenerateInput): GenerateOutput => {
     model.fields.some((field) => field.type === "Json")
   );
 
+  // Factory for creating resolvers per model
+  const makeResolver = (modelName: string) =>
+    SchemaResolver.make({ modelName, brandedIds, foreignKeys, config });
+
   // Assemble sections
   const sections = [
     // Header
@@ -80,7 +84,7 @@ export const generate = (input: GenerateInput): GenerateOutput => {
 
     // Models
     sectionHeader("Models (scalar fields only)"),
-    generateModelSchemas(models, brandedIds, foreignKeys, config),
+    generateModelSchemas(models, makeResolver, config),
   ];
 
   return {

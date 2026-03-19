@@ -16,6 +16,7 @@ import {
 } from "effect";
 import { capitalize } from "effect/String";
 import type { GeneratorConfig } from "./config.js";
+import { emit } from "./emit.js";
 import { UnsupportedTypeError } from "./errors.js";
 
 // ============================================================================
@@ -293,36 +294,7 @@ export const SchemaResolver = {
       });
     };
 
-    // ========================================================================
-    // Emission (inline for fieldToSchema convenience)
-    // ========================================================================
-
-    const emitBase = (base: BaseType): string => {
-      switch (base._tag) {
-        case "Primitive":
-          return base.schema === "Json" ? "JsonValueSchema" : `Schema.${base.schema}`;
-        case "BrandedId":
-          return base.name;
-        case "Enum":
-          return base.name;
-        case "Relation":
-          return `Schema.suspend(() => ${base.modelName})`;
-      }
-    };
-
-    const fieldToSchema = (field: DMMF.Field): string => {
-      const resolved = resolve(field);
-      let result = emitBase(resolved.base);
-
-      for (const wrapper of resolved.wrappers) {
-        result =
-          wrapper === "Array"
-            ? `Schema.Array(${result})`
-            : `Schema.NullOr(${result})`;
-      }
-
-      return result;
-    };
+    const fieldToSchema = (field: DMMF.Field): string => emit(resolve(field));
 
     return {
       resolve,
