@@ -124,19 +124,28 @@ describe("generate", () => {
         // Do not edit manually - changes will be overwritten
         // https://github.com/frontcore/prisma-effect-schema
 
-        import { Schema } from "effect"// ============================================================================
+        import { Schema } from "effect"
+
+        // ============================================================================
         // Branded IDs
-        // ============================================================================export const UserId = Schema.String.pipe(Schema.brand("UserId"))
-        export type UserId = typeof UserId.Type// ============================================================================
+        // ============================================================================
+
+
+        export const UserId = Schema.String.pipe(Schema.brand("UserId"))
+        export type UserId = typeof UserId.Type
+        // ============================================================================
         // Models (scalar fields only)
-        // ============================================================================export const User = Schema.Struct({
-              active: Schema.Boolean,
-        age: Schema.Int,
-        balance: Schema.Number,
-        email: Schema.String,
-        id: UserId
-          })
-          export type User = typeof User.Type"
+        // ============================================================================
+
+
+        export const User = Schema.Struct({
+          active: Schema.Boolean,
+          age: Schema.Int,
+          balance: Schema.Number,
+          email: Schema.String,
+          id: UserId
+        })
+        export type User = typeof User.Type"
       `);
       expect(result.stats).toEqual({
         enumCount: 0,
@@ -238,22 +247,31 @@ describe("generate", () => {
         // Do not edit manually - changes will be overwritten
         // https://github.com/frontcore/prisma-effect-schema
 
-        import { Schema } from "effect"// ============================================================================
+        import { Schema } from "effect"
+
+        // ============================================================================
         // Branded IDs
-        // ============================================================================export const PostId = Schema.String.pipe(Schema.brand("PostId"))
+        // ============================================================================
+
+
+        export const PostId = Schema.String.pipe(Schema.brand("PostId"))
         export type PostId = typeof PostId.Type
 
         export const UserId = Schema.String.pipe(Schema.brand("UserId"))
-        export type UserId = typeof UserId.Type// ============================================================================
+        export type UserId = typeof UserId.Type
+        // ============================================================================
         // Models (scalar fields only)
-        // ============================================================================export const Post = Schema.Struct({
-              authorId: UserId,
-        id: PostId,
-        title: Schema.String
-          })
-          export type Post = typeof Post.Type
+        // ============================================================================
+
+
+        export const Post = Schema.Struct({
+          authorId: UserId,
+          id: PostId,
+          title: Schema.String
+        })
+        export type Post = typeof Post.Type
         export const User = Schema.Struct({
-            id: UserId
+          id: UserId
         })
         export type User = typeof User.Type"
       `);
@@ -300,19 +318,32 @@ describe("generate", () => {
         // Do not edit manually - changes will be overwritten
         // https://github.com/frontcore/prisma-effect-schema
 
-        import { Schema } from "effect"// ============================================================================
+        import { Schema } from "effect"
+
+        // ============================================================================
         // Enums
-        // ============================================================================export const PostStatus = Schema.Literal("ARCHIVED", "DRAFT", "PUBLISHED")
-        export type PostStatus = typeof PostStatus.Type// ============================================================================
+        // ============================================================================
+
+
+        export const PostStatus = Schema.Literal("ARCHIVED", "DRAFT", "PUBLISHED")
+        export type PostStatus = typeof PostStatus.Type
+        // ============================================================================
         // Branded IDs
-        // ============================================================================export const PostId = Schema.String.pipe(Schema.brand("PostId"))
-        export type PostId = typeof PostId.Type// ============================================================================
+        // ============================================================================
+
+
+        export const PostId = Schema.String.pipe(Schema.brand("PostId"))
+        export type PostId = typeof PostId.Type
+        // ============================================================================
         // Models (scalar fields only)
-        // ============================================================================export const Post = Schema.Struct({
-              id: PostId,
-        status: PostStatus
-          })
-          export type Post = typeof Post.Type"
+        // ============================================================================
+
+
+        export const Post = Schema.Struct({
+          id: PostId,
+          status: PostStatus
+        })
+        export type Post = typeof Post.Type"
       `);
       expect(result.stats.enumCount).toBe(1);
     });
@@ -632,13 +663,22 @@ describe("generate", () => {
         // Do not edit manually - changes will be overwritten
         // https://github.com/frontcore/prisma-effect-schema
 
-        import { Schema } from "effect"// ============================================================================
+        import { Schema } from "effect"
+
+        // ============================================================================
         // Branded IDs
-        // ============================================================================export const TokenId = Schema.String.pipe(Schema.brand("TokenId"))
-        export type TokenId = typeof TokenId.Type// ============================================================================
+        // ============================================================================
+
+
+        export const TokenId = Schema.String.pipe(Schema.brand("TokenId"))
+        export type TokenId = typeof TokenId.Type
+        // ============================================================================
         // Models (scalar fields only)
-        // ============================================================================export const Token = Schema.Struct({
-            id: TokenId
+        // ============================================================================
+
+
+        export const Token = Schema.Struct({
+          id: TokenId
         })
         export type Token = typeof Token.Type"
       `);

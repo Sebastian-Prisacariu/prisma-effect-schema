@@ -79,7 +79,7 @@ export const generate = (input: GenerateInput): GenerateOutput => {
 
     // Branded IDs
     ...(brandedIdCount > 0
-      ? [sectionHeader("Branded IDs"), generateBrandedIdSchemas(brandedIds), ""]
+      ? [sectionHeader("Branded IDs"), generateBrandedIdSchemas(brandedIds)]
       : []),
 
     // Models
@@ -88,7 +88,7 @@ export const generate = (input: GenerateInput): GenerateOutput => {
   ];
 
   return {
-    content: sections.join(""),
+    content: sections.join("\n"),
     stats: {
       enumCount: enums.length,
       modelCount: models.length,
