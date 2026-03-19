@@ -12,11 +12,9 @@
  * ```
  */
 
-export {
-  generate,
-  UnsupportedTypeError,
-  makeUnsupportedTypeError,
-} from "./generate.js";
+export { GeneratorConfigSchema } from "./config.js";
+export type { GeneratorConfig } from "./config.js";
+export { UnsupportedTypeError } from "./errors.js";
+export { generate, makeUnsupportedTypeError } from "./generate.js";
 export type { GenerateInput, GenerateOutput } from "./generate.js";
-export { resolveConfig, DEFAULT_CONFIG } from "./types.js";
-export type { GeneratorConfig, ResolvedConfig } from "./types.js";
+

@@ -44,6 +44,8 @@
     "prepublishOnly": "pnpm build"
   },
   "dependencies": {
+    "@effect/platform": "^0.95.0",
+    "@effect/platform-node": "^0.105.0",
     "@prisma/generator-helper": "^6.5.0",
     "dedent": "^1.7.2"
   },

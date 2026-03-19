@@ -3,56 +3,36 @@
  *
  * This module registers the generator with Prisma and handles the generation lifecycle.
  */
-import pkg from "@prisma/generator-helper";
+import { FileSystem } from "@effect/platform";
+import { NodeFileSystem, NodePath } from "@effect/platform-node";
+import { Path } from "@effect/platform/Path";
 import type { GeneratorOptions } from "@prisma/generator-helper";
-import fs from "node:fs/promises";
-import path from "node:path";
+import { generatorHandler } from "@prisma/generator-helper";
+import { Effect, Layer, Option } from "effect";
+import { parseConfig } from "./config.js";
+import { NoOutputConfiguredError } from "./errors.js";
 import { generate } from "./generate.js";
-import { resolveConfig, type GeneratorConfig } from "./types.js";
 
-const { generatorHandler } = pkg;
 
-/**
- * Get a single string value from a config field (handles arrays)
- */
-function getConfigValue(
-  value: string | string[] | undefined,
-): string | undefined {
-  if (Array.isArray(value)) return value[0];
-  return value;
-}
 
-/**
- * Parse generator config from Prisma schema
- */
-function parseConfig(options: GeneratorOptions): GeneratorConfig {
-  const config = options.generator.config;
+const program = Effect.fnUntraced(function* (options: GeneratorOptions) {
+  const fs = yield* FileSystem.FileSystem;
+  const path = yield* Path;
 
-  return {
-    includeRelations: getConfigValue(config.includeRelations) === "true",
-    useBrandedIds: getConfigValue(config.useBrandedIds) !== "false", // default true
-    dateTimeHandling:
-      getConfigValue(config.dateTimeHandling) === "DateTimeString"
-        ? "DateTimeString"
-        : "Date",
-    sortFields: getConfigValue(config.sortFields) !== "false", // default true
-    customHeader: getConfigValue(config.customHeader),
-  };
-}
+  const outputPath = yield* Effect.fromNullable(
+    options.generator.output?.value
+  ).pipe(
+    Effect.mapError(
+      ({ cause, message, ...rest }) =>
+        new NoOutputConfiguredError({
+          cause,
+          details: message,
+          ...rest,
+        })
+    )
+  );
 
-/**
- * Main generation handler called by Prisma
- */
-async function onGenerate(options: GeneratorOptions): Promise<void> {
-  const outputPath = options.generator.output?.value;
-
-  if (!outputPath) {
-    throw new Error(
-      "prisma-effect-schema: No output path specified in generator config",
-    );
-  }
-
-  const config = resolveConfig(parseConfig(options));
+  const config = yield* parseConfig(options);
 
   const { content, stats } = generate({
     dmmf: options.dmmf,
@@ -60,17 +40,20 @@ async function onGenerate(options: GeneratorOptions): Promise<void> {
   });
 
   // Ensure output directory exists
-  await fs.mkdir(path.dirname(outputPath), { recursive: true });
+  yield* fs.makeDirectory(path.dirname(outputPath), { recursive: true });
 
   // Write the generated file
-  await fs.writeFile(outputPath, content, "utf-8");
+  yield* fs.writeFileString(outputPath, content);
 
-  console.log(`✅ prisma-effect-schema: Generated Effect Schemas`);
-  console.log(`   Output: ${outputPath}`);
-  console.log(
-    `   Stats: ${stats.enumCount} enums, ${stats.modelCount} models, ${stats.brandedIdCount} branded IDs`,
+  yield* Effect.logInfo(`✅ prisma-effect-schema: Generated Effect Schemas`);
+  yield* Effect.logInfo(`   Output: ${outputPath}`);
+  yield* Effect.logInfo(
+    `   Stats: ${stats.enumCount} enums, ${stats.modelCount} models, ${stats.brandedIdCount} branded IDs`
   );
-}
+})
+const PlatformLive = Layer.mergeAll(NodeFileSystem.layer, NodePath.layer);
+
+
 
 // Register as Prisma generator
 generatorHandler({
@@ -79,7 +62,11 @@ generatorHandler({
       defaultOutput: "./generated/effect-schemas.ts",
       prettyName: "Effect Schema Generator",
       // No requiresGenerators - we only need the DMMF which is always available
+      // ?? explain
     };
   },
-  onGenerate,
+  onGenerate: (options: GeneratorOptions) => program(options).pipe(
+    Effect.provide(PlatformLive),
+    Effect.runPromise
+  ),
 });

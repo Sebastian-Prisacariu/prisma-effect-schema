@@ -1,3 +1,4 @@
+
 type IdSuffix = "Id" | "id" | "ID" | "iD";
 
 export function removeIdSuffix<T extends string>(
@@ -8,3 +9,4 @@ export function removeIdSuffix<T extends string>(
   }
   return name as T extends `${infer R}${IdSuffix}` ? R : T;
 }
+
