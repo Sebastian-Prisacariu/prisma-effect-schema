@@ -1,3 +1,4 @@
+import dedent from "dedent";
 import { Schema } from "effect";
 
 export const AppTag = "[prisma-effect-schema]";
@@ -14,7 +15,10 @@ export class UnsupportedTypeError extends Schema.TaggedError<UnsupportedTypeErro
   },
 ) {
   override get message(): string {
-    return `${AppTag} Unsupported Prisma type "${this.typeName}" for field "${this.fieldName}" in model "${this.modelName}". Please open an issue at https://github.com/frontcore/prisma-effect-schema/issues`;
+    return dedent`
+      ${AppTag} Unsupported Prisma type "${this.typeName}" for field "${this.fieldName}" in model "${this.modelName}".
+      Please open an issue at https://github.com/frontcore/prisma-effect-schema/issues
+    `;
   }
 }
 
