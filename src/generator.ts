@@ -78,7 +78,7 @@ generatorHandler({
     return {
       defaultOutput: "./generated/effect-schemas.ts",
       prettyName: "Effect Schema Generator",
-      requiresGenerators: ["prisma-client-js"],
+      // No requiresGenerators - we only need the DMMF which is always available
     };
   },
   onGenerate,
